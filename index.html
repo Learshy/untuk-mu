@@ -476,6 +476,9 @@
   </div>
 
   <div class="music-btn" id="musicBtn" onclick="toggleMusic()">♫</div>
+  <audio id="bgMusic" loop preload="auto" playsinline>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- MAIN -->
   <div id="main-content">
@@ -754,79 +757,42 @@
     });
 
     /* ════════════════════════════════════════
-       MUSIC (Web Audio - Lo-fi Piano)
+       MUSIC
     ════════════════════════════════════════ */
-    let actx, playing = false;
+    let playing = false;
     const mBtn = document.getElementById('musicBtn');
+    const bgMusic = document.getElementById('bgMusic');
+    bgMusic.volume = 0.45;
 
-    function toggleMusic() {
+    async function toggleMusic() {
       if (playing) {
-        actx && actx.close();
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
         playing = false;
         mBtn.classList.remove('playing');
         mBtn.textContent = '♫';
-      } else {
-        actx = new (window.AudioContext || window.webkitAudioContext)();
-        playLofi(actx);
+        return;
+      }
+
+      try {
+        await bgMusic.play();
         playing = true;
         mBtn.classList.add('playing');
         mBtn.textContent = '♩';
+      } catch (err) {
+        console.error('Music play failed:', err);
       }
     }
 
-    function playLofi(ctx) {
-      // Gentle lo-fi piano melody in C major
-      const melody = [
-        { f: 261.63, d: 0.5 },  // C4
-        { f: 293.66, d: 0.4 },  // D4
-        { f: 329.63, d: 0.5 },  // E4
-        { f: 293.66, d: 0.35 }, // D4
-        { f: 261.63, d: 0.6 },  // C4
-        { f: 329.63, d: 0.4 },  // E4
-        { f: 349.23, d: 0.5 },  // F4
-        { f: 392.00, d: 0.7 },  // G4
-        { f: 349.23, d: 0.4 },  // F4
-        { f: 329.63, d: 0.5 },  // E4
-        { f: 293.66, d: 0.35 }, // D4
-        { f: 261.63, d: 1.0 },  // C4
-        { f: 293.66, d: 0.5 },  // D4
-        { f: 349.23, d: 0.5 },  // F4
-        { f: 329.63, d: 0.4 },  // E4
-        { f: 293.66, d: 0.6 },  // D4
-        { f: 261.63, d: 1.2 },  // C4
-      ];
+    bgMusic.addEventListener('ended', () => {
+      playing = false;
+      mBtn.classList.remove('playing');
+      mBtn.textContent = '♫';
+    });
 
-      let t = 0.1;
-      const master = ctx.createGain();
-      master.gain.value = 0.045;
-      master.connect(ctx.destination);
-
-      function playSeq() {
-        if (!playing) return;
-        t = 0.1;
-        melody.forEach(n => {
-          const osc = ctx.createOscillator();
-          osc.type = 'triangle';
-          osc.frequency.value = n.f;
-
-          const g = ctx.createGain();
-          g.gain.setValueAtTime(0.045, ctx.currentTime + t);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + n.d);
-
-          osc.connect(g);
-          g.connect(ctx.destination);
-          osc.start(ctx.currentTime + t);
-          osc.stop(ctx.currentTime + t + n.d);
-
-          t += n.d + 0.08;
-        });
-
-        setTimeout(() => { if (playing) playSeq(); }, (t + 0.2) * 1000);
-      }
-      playSeq();
-    }
-
-    window.addEventListener('beforeunload', () => { if (actx) actx.close(); });
+    window.addEventListener('beforeunload', () => {
+      bgMusic.pause();
+    });
   </script>
 </body>
 </html>

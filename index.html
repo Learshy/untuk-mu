@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untukmu, Sayang 🤍</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    ::selection {
+      background: rgba(180, 160, 220, 0.3);
+      color: #fff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0b0b12;
+      color: #e8e4f0;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    /* ─── PARTICLES ─── */
+    #particles-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ─── ENVELOPE ─── */
+    #envelope-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(145deg, #0b0b12 0%, #1a1625 40%, #0b0b12 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      cursor: pointer;
+      transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #envelope-screen.hidden {
+      opacity: 0;
+      transform: scale(1.08);
+      pointer-events: none;
+    }
+
+    .env-orb {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, rgba(180,160,220,0.15), transparent 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+      animation: envFloat 3s ease-in-out infinite;
+      position: relative;
+    }
+    .env-orb::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px solid rgba(180,160,220,0.1);
+      animation: orbPulse 3s ease-in-out infinite;
+    }
+    .env-icon {
+      font-size: 56px;
+      filter: drop-shadow(0 0 30px rgba(180,160,220,0.3));
+    }
+    @keyframes envFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.08); opacity: 0.2; }
+    }
+
+    .env-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      color: #d4c8ec;
+      opacity: 0;
+      animation: fadeSlide 0.8s forwards 0.4s;
+      letter-spacing: 0.5px;
+    }
+    .env-sub {
+      font-size: 13px;
+      color: rgba(180,160,220,0.35);
+      margin-top: 8px;
+      opacity: 0;
+      animation: fadeSlide 0.8s forwards 0.7s;
+      letter-spacing: 0.3px;
+    }
+    .env-tap {
+      position: absolute;
+      bottom: 50px;
+      font-size: 12px;
+      color: rgba(180,160,220,0.2);
+      animation: envPulse 1.8s ease-in-out infinite;
+      letter-spacing: 1px;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes envPulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.6; }
+    }
+
+    /* ─── CONTENT ─── */
+    #main-content {
+      position: relative;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #main-content.visible { opacity: 1; }
+
+    section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 24px;
+      position: relative;
+    }
+
+    .section-inner {
+      max-width: 680px;
+      width: 100%;
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+      background: linear-gradient(165deg, #0b0b12 0%, #1a1625 50%, #0b0b12 100%);
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+    }
+    .hero-icon {
+      font-size: 48px;
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 5vw, 38px);
+      line-height: 1.4;
+      color: #d4c8ec;
+      font-weight: 400;
+      margin-bottom: 18px;
+      letter-spacing: -0.3px;
+    }
+    .hero-divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(180,160,220,0.2);
+      margin: 12px auto 18px;
+    }
+    .hero-sub {
+      font-size: clamp(14px, 2.5vw, 16px);
+      color: rgba(180,160,220,0.5);
+      font-weight: 300;
+      max-width: 480px;
+      line-height: 1.8;
+      margin: 0 auto;
+    }
+    .hero-scroll {
+      position: absolute;
+      bottom: 28px;
+      font-size: 18px;
+      color: rgba(180,160,220,0.15);
+      animation: scrollBounce 2.2s ease-in-out infinite;
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    /* ─── LETTER ─── */
+    #letter {
+      background: linear-gradient(165deg, #0b0b12, #151120, #0b0b12);
+    }
+    .letter-card {
+      background: linear-gradient(
+        160deg,
+        rgba(255,255,255,0.03) 0%,
+        rgba(180,160,220,0.04) 100%
+      );
+      border: 1px solid rgba(180,160,220,0.08);
+      border-radius: 20px;
+      padding: 52px 40px;
+      position: relative;
+    }
+    .letter-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 40px;
+      right: 40px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(180,160,220,0.2), transparent);
+    }
+    .letter-card .ornament {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 28px;
+      opacity: 0.5;
+    }
+    .letter-body {
+      font-size: 15px;
+      line-height: 2;
+      color: rgba(232,228,240,0.78);
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+    .letter-body p {
+      margin-bottom: 18px;
+      text-indent: 0;
+    }
+    .letter-body p:first-of-type {
+      text-indent: 0;
+    }
+    .letter-body strong {
+      color: rgba(212,200,236,0.9);
+      font-weight: 500;
+    }
+
+    /* ─── TIMELINE ─── */
+    #memories {
+      background: #0b0b12;
+    }
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: rgba(180,160,220,0.3);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(24px, 4vw, 32px);
+      color: #d4c8ec;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+    .section-desc {
+      font-size: 14px;
+      color: rgba(180,160,220,0.4);
+      margin-bottom: 48px;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .tl-item {
+      display: flex;
+      gap: 20px;
+      padding-bottom: 36px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tl-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .tl-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 32px;
+    }
+    .tl-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid rgba(180,160,220,0.2);
+      background: #0b0b12;
+      flex-shrink: 0;
+      transition: all 0.5s ease;
+    }
+    .tl-item.visible .tl-dot {
+      border-color: rgba(180,160,220,0.5);
+      box-shadow: 0 0 12px rgba(180,160,220,0.08);
+    }
+    .tl-line {
+      width: 1px;
+      flex: 1;
+      background: linear-gradient(180deg, rgba(180,160,220,0.12), transparent);
+      margin-top: 4px;
+    }
+    .tl-body {
+      flex: 1;
+      padding-top: 2px;
+    }
+    .tl-icon {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+    .tl-body h4 {
+      font-size: 15px;
+      font-weight: 500;
+      color: #d4c8ec;
+      margin-bottom: 4px;
+    }
+    .tl-body p {
+      font-size: 14px;
+      color: rgba(180,160,220,0.5);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ─── REASONS ─── */
+    #reasons {
+      background: linear-gradient(165deg, #151120, #0b0b12);
+    }
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .rc {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(180,160,220,0.06);
+      border-radius: 16px;
+      padding: 28px 22px;
+      text-align: center;
+      transition: all 0.35s ease;
+    }
+    .rc:hover {
+      border-color: rgba(180,160,220,0.15);
+      background: rgba(255,255,255,0.03);
+      transform: translateY(-3px);
+    }
+    .rc-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .rc h4 {
+      font-size: 14px;
+      font-weight: 500;
+      color: #d4c8ec;
+      margin-bottom: 8px;
+    }
+    .rc p {
+      font-size: 13px;
+      color: rgba(180,160,220,0.45);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ─── CLOSING ─── */
+    #closing {
+      background: linear-gradient(165deg, #0b0b12, #1a1625, #0b0b12);
+      text-align: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .closing-orb {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, rgba(180,160,220,0.08), transparent 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 30px;
+      animation: envFloat 3s ease-in-out infinite;
+    }
+    .closing-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 5vw, 40px);
+      color: #d4c8ec;
+      font-weight: 400;
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
+    }
+    .closing-text {
+      font-size: 14px;
+      color: rgba(180,160,220,0.5);
+      font-weight: 300;
+      max-width: 520px;
+      line-height: 2;
+      margin: 0 auto;
+    }
+    .closing-divider {
+      width: 30px;
+      height: 1px;
+      background: rgba(180,160,220,0.15);
+      margin: 20px auto;
+    }
+
+    /* ─── FLOATING PARTICLES (click) ─── */
+    .particle-burst {
+      position: fixed;
+      pointer-events: none;
+      z-index: 3;
+      font-size: 14px;
+      animation: particleUp 2.8s ease-out forwards;
+    }
+    @keyframes particleUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-300px) scale(0.2); opacity: 0; }
+    }
+
+    /* ─── MUSIC BTN ─── */
+    .music-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      background: rgba(180,160,220,0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(180,160,220,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 100;
+      color: rgba(180,160,220,0.35);
+      transition: all 0.3s ease;
+    }
+    .music-btn:hover {
+      background: rgba(180,160,220,0.1);
+      border-color: rgba(180,160,220,0.2);
+      color: rgba(180,160,220,0.6);
+    }
+    .music-btn.playing {
+      color: #d4c8ec;
+      border-color: rgba(180,160,220,0.2);
+      animation: mPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes mPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(180,160,220,0.06); }
+      50% { box-shadow: 0 0 16px 4px rgba(180,160,220,0.04); }
+    }
+
+    @media (max-width: 520px) {
+      section { padding: 60px 18px; }
+      .letter-card { padding: 36px 22px; }
+      .reasons-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ENVELOPE -->
+  <div id="envelope-screen" onclick="openEnvelope()">
+    <div class="env-orb">
+      <div class="env-icon">🤍</div>
+    </div>
+    <div class="env-title">Ada sesuatu buat kamu</div>
+    <div class="env-sub">cukup tap layar untuk membuka</div>
+    <div class="env-tap">ketuk</div>
+  </div>
+
+  <div class="music-btn" id="musicBtn" onclick="toggleMusic()">♫</div>
+
+  <!-- MAIN -->
+  <div id="main-content">
+
+    <!-- HERO -->
+    <section id="hero">
+      <div class="section-inner">
+        <div class="hero-icon">🤍</div>
+        <h1 class="hero-title">Untukmu, Sayang</h1>
+        <div class="hero-divider"></div>
+        <p class="hero-sub">
+          Ini bukan hadiah, ini hanya permintaan maafku yang setiap kata di halaman ini
+          ditulis setelah kepala aku kembali tenang.
+        </p>
+        <div class="hero-scroll">⌄</div>
+      </div>
+    </section>
+
+    <!-- LETTER -->
+    <section id="letter">
+      <div class="section-inner">
+        <div class="letter-card">
+          <div class="ornament">— 🤍 —</div>
+          <div class="letter-body">
+            <p>Halo sayang.</p>
+            <p>
+              Beberapa hari ini aku memilih diam. Bukan karena marah, bukan karena
+              rasa sayang aku berkurang, apalagi karena ada orang lain. Aku cuma
+              sedang kelelahan.
+            </p>
+            <p>
+              Setelah semuanya mulai tenang, aku sadar kalau selama kita berdebat,
+              kita sama-sama sibuk menyampaikan apa yang kita rasakan, sampai lupa
+              mendengar apa yang sebenarnya sedang dirasakan satu sama lain.
+            </p>
+            <p>
+              Aku minta maaf kalau cara aku menyampaikan sesuatu sering terdengar
+              seperti melawan. Padahal yang selama ini aku lakukan cuma berusaha
+              menjelaskan isi kepala aku, bukan mencari siapa yang benar atau siapa
+              yang salah.
+            </p>
+            <p>
+              Di balik semua itu, ada banyak hal yang selama ini aku pendam sendiri.
+              Soal pekerjaan, keuangan, keluarga, masa depan, dan keinginan aku
+              untuk bisa menjadi laki-laki yang benar-benar pantas buat kamu.
+              Semua itu terus berputar di kepala aku setiap hari sampai aku sendiri
+              lupa caranya istirahat.
+            </p>
+            <p>
+              Maaf kalau selama ini aku terlalu sibuk memendam semuanya sendirian.
+              Maaf kalau aku belum bisa menjadi pasangan yang sempurna. Tapi ada
+              satu hal yang ingin aku pastikan,
+              <strong>rasa sayang aku ke kamu tidak pernah berubah.</strong>
+            </p>
+            <p>
+              Terima kasih karena masih bertahan sampai hari ini. Semoga setelah
+              kamu selesai membaca halaman ini, kita bisa mulai lagi dengan hati
+              yang lebih tenang, bukan dengan ego yang lebih besar.
+            </p>
+            <p>
+              <strong>
+                Aku masih memilih kamu. Dan sampai hari ini, aku masih punya tujuan
+                yang sama seperti dulu, yaitu berjuang supaya suatu hari nanti bisa
+                menghalalkan kamu.
+              </strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMORIES -->
+    <section id="memories">
+      <div class="section-inner">
+        <div class="section-label">Kenangan</div>
+        <h2 class="section-title">Perjalanan Kita</h2>
+        <p class="section-desc">Hal-hal yang mengingatkan aku kenapa aku masih bertahan</p>
+
+        <div class="timeline">
+          <div class="tl-item" data-delay="0">
+            <div class="tl-marker">
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-icon">🤍</div>
+              <h4>Semuanya Dimulai</h4>
+              <p>Dari awal kita kenal sampai hari ini, aku masih memilih orang yang sama. Kamu.</p>
+            </div>
+          </div>
+
+          <div class="tl-item" data-delay="150">
+            <div class="tl-marker">
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-icon">🌧️</div>
+              <h4>Setiap Pertengkaran</h4>
+              <p>Kita pernah saling kecewa, pernah saling menyakiti, tapi aku percaya hubungan ini selalu lebih berharga daripada ego kita.</p>
+            </div>
+          </div>
+
+          <div class="tl-item" data-delay="300">
+            <div class="tl-marker">
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-icon">💪</div>
+              <h4>Fase Dewasa</h4>
+              <p>Sekarang hidup bukan cuma soal cinta. Ada pekerjaan, keluarga, tanggung jawab, dan masa depan yang sedang aku perjuangkan sedikit demi sedikit.</p>
+            </div>
+          </div>
+
+          <div class="tl-item" data-delay="450">
+            <div class="tl-marker">
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-icon">🌅</div>
+              <h4>Harapan Aku</h4>
+              <p>Aku belum bisa memberi semua yang kamu inginkan hari ini. Tapi aku masih ingin terus berjuang sampai nanti kita bisa menikmati semuanya bersama.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REASONS -->
+    <section id="reasons">
+      <div class="section-inner">
+        <div class="section-label">Alasan</div>
+        <h2 class="section-title">Kenapa Aku Masih Bertahan</h2>
+        <p class="section-desc">Bukan karena alasan besar. Hanya hal kecil yang membuat aku yakin.</p>
+
+        <div class="reasons-grid">
+          <div class="rc">
+            <div class="rc-icon">❤️</div>
+            <h4>Karena Kamu Adalah Rumah</h4>
+            <p>Di tengah semua masalah yang datang, tetap kamu yang selalu ingin aku pulangi.</p>
+          </div>
+          <div class="rc">
+            <div class="rc-icon">🌸</div>
+            <h4>Karena Aku Masih Sangat Sayang</h4>
+            <p>Seberat apa pun hari yang aku jalani, rasa sayang itu tidak pernah berubah.</p>
+          </div>
+          <div class="rc">
+            <div class="rc-icon">🤍</div>
+            <h4>Karena Hubungan Ini Layak Diperjuangkan</h4>
+            <p>Aku tidak ingin menyerah hanya karena kita sedang berada di fase yang sulit.</p>
+          </div>
+          <div class="rc">
+            <div class="rc-icon">💍</div>
+            <h4>Karena Tujuan Aku Masih Sama</h4>
+            <p>Dari dulu sampai sekarang, aku masih ingin berjuang supaya suatu hari nanti bisa menghalalkan kamu.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSING -->
+    <section id="closing">
+      <div class="section-inner">
+        <div class="closing-orb">🤍</div>
+        <h2 class="closing-title">Aku Sayang Kamu, Selalu</h2>
+        <div class="closing-divider"></div>
+        <p class="closing-text">
+          Terima kasih sudah membaca semuanya sampai akhir. Kalau hari ini kamu
+          masih kecewa atau masih marah, aku mengerti. Aku cuma berharap kamu bisa
+          mengerti satu hal: diamnya aku beberapa hari ini bukan karena berhenti
+          mencintaimu. Aku hanya sedang berusaha berdamai dengan banyak hal yang
+          sedang aku hadapi. Semoga setelah ini kita bisa belajar saling mendengar,
+          saling mengerti, dan terus berjalan bersama.
+        </p>
+        <div style="margin-top:32px; font-size:12px; color:rgba(180,160,220,0.2);">
+          — ketuk di mana saja —
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    /* ════════════════════════════════════════
+       PARTICLES
+    ════════════════════════════════════════ */
+    const cv = document.getElementById('particles-canvas');
+    const cx = cv.getContext('2d');
+    let pts = [];
+
+    function resize() {
+      cv.width = window.innerWidth;
+      cv.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function initPts() {
+      pts = [];
+      const n = Math.floor((cv.width * cv.height) / 4000);
+      for (let i = 0; i < n; i++) {
+        pts.push({
+          x: Math.random() * cv.width,
+          y: Math.random() * cv.height,
+          r: Math.random() * 1.6 + 0.4,
+          a: Math.random(),
+          s: 0.001 + Math.random() * 0.004
+        });
+      }
+    }
+
+    function drawPts(t) {
+      cx.clearRect(0, 0, cv.width, cv.height);
+      pts.forEach(p => {
+        p.a = 0.15 + Math.sin(t * p.s) * 0.25;
+        cx.beginPath();
+        cx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        cx.fillStyle = `rgba(180, 160, 220, ${Math.max(0, p.a)})`;
+        cx.fill();
+      });
+      requestAnimationFrame(drawPts);
+    }
+    initPts();
+    drawPts(0);
+    window.addEventListener('resize', () => { resize(); initPts(); });
+
+    /* ════════════════════════════════════════
+       ENVELOPE
+    ════════════════════════════════════════ */
+    function openEnvelope() {
+      const env = document.getElementById('envelope-screen');
+      env.classList.add('hidden');
+      document.getElementById('main-content').classList.add('visible');
+      setTimeout(spawnParticle, 600);
+      window._burstInterval = setInterval(spawnParticle, 500);
+    }
+
+    /* ════════════════════════════════════════
+       TIMELINE INTERSECTION
+    ════════════════════════════════════════ */
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const d = parseInt(e.target.dataset.delay) || 0;
+          setTimeout(() => e.target.classList.add('visible'), d);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.tl-item').forEach(el => obs.observe(el));
+
+    /* ════════════════════════════════════════
+       PARTICLE BURST ON CLICK
+    ════════════════════════════════════════ */
+    const particleChars = ['🤍', '✦', '·', '🤍', '·', '✦', '🤍'];
+
+    function spawnParticle() {
+      const el = document.createElement('div');
+      el.className = 'particle-burst';
+      el.textContent = particleChars[Math.floor(Math.random() * particleChars.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.bottom = '-10px';
+      el.style.fontSize = (12 + Math.random() * 14) + 'px';
+      el.style.animationDuration = (2 + Math.random() * 2.5) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }
+
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#envelope-screen') || e.target.closest('.music-btn')) return;
+      for (let i = 0; i < 6; i++) {
+        setTimeout(spawnParticle, i * 60);
+      }
+    });
+
+    /* ════════════════════════════════════════
+       MUSIC (Web Audio - Lo-fi Piano)
+    ════════════════════════════════════════ */
+    let actx, playing = false;
+    const mBtn = document.getElementById('musicBtn');
+
+    function toggleMusic() {
+      if (playing) {
+        actx && actx.close();
+        playing = false;
+        mBtn.classList.remove('playing');
+        mBtn.textContent = '♫';
+      } else {
+        actx = new (window.AudioContext || window.webkitAudioContext)();
+        playLofi(actx);
+        playing = true;
+        mBtn.classList.add('playing');
+        mBtn.textContent = '♩';
+      }
+    }
+
+    function playLofi(ctx) {
+      // Gentle lo-fi piano melody in C major
+      const melody = [
+        { f: 261.63, d: 0.5 },  // C4
+        { f: 293.66, d: 0.4 },  // D4
+        { f: 329.63, d: 0.5 },  // E4
+        { f: 293.66, d: 0.35 }, // D4
+        { f: 261.63, d: 0.6 },  // C4
+        { f: 329.63, d: 0.4 },  // E4
+        { f: 349.23, d: 0.5 },  // F4
+        { f: 392.00, d: 0.7 },  // G4
+        { f: 349.23, d: 0.4 },  // F4
+        { f: 329.63, d: 0.5 },  // E4
+        { f: 293.66, d: 0.35 }, // D4
+        { f: 261.63, d: 1.0 },  // C4
+        { f: 293.66, d: 0.5 },  // D4
+        { f: 349.23, d: 0.5 },  // F4
+        { f: 329.63, d: 0.4 },  // E4
+        { f: 293.66, d: 0.6 },  // D4
+        { f: 261.63, d: 1.2 },  // C4
+      ];
+
+      let t = 0.1;
+      const master = ctx.createGain();
+      master.gain.value = 0.045;
+      master.connect(ctx.destination);
+
+      function playSeq() {
+        if (!playing) return;
+        t = 0.1;
+        melody.forEach(n => {
+          const osc = ctx.createOscillator();
+          osc.type = 'triangle';
+          osc.frequency.value = n.f;
+
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0.045, ctx.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + n.d);
+
+          osc.connect(g);
+          g.connect(ctx.destination);
+          osc.start(ctx.currentTime + t);
+          osc.stop(ctx.currentTime + t + n.d);
+
+          t += n.d + 0.08;
+        });
+
+        setTimeout(() => { if (playing) playSeq(); }, (t + 0.2) * 1000);
+      }
+      playSeq();
+    }
+
+    window.addEventListener('beforeunload', () => { if (actx) actx.close(); });
+  </script>
+</body>
+</html>

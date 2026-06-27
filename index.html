@@ -5,119 +5,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For-you Dear</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+    :root {
+      --bg-1: #080910;
+      --bg-2: #120f1d;
+      --bg-3: #1c1730;
+      --panel: rgba(255,255,255,0.05);
+      --panel-strong: rgba(255,255,255,0.08);
+      --line: rgba(214, 193, 255, 0.14);
+      --line-strong: rgba(214, 193, 255, 0.24);
+      --text: #f5f1fb;
+      --muted: rgba(233,225,245,0.66);
+      --soft: rgba(214,193,255,0.46);
+      --accent: #d8c4ff;
+      --accent-2: #ffc7df;
+      --glow: 0 20px 60px rgba(94, 68, 145, 0.22);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --shadow-card: 0 18px 60px rgba(0,0,0,0.34);
+      --max: 760px;
+    }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    ::selection {
-      background: rgba(180, 160, 220, 0.3);
-      color: #fff;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #0b0b12;
-      color: #e8e4f0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(216,196,255,0.12), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(255,199,223,0.10), transparent 26%),
+        radial-gradient(circle at 50% 100%, rgba(130,98,200,0.16), transparent 38%),
+        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 45%, #090910 100%);
+      color: var(--text);
       overflow-x: hidden;
-      line-height: 1.7;
+      line-height: 1.75;
+      min-height: 100vh;
     }
 
-    /* ─── PARTICLES ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, black 34%, transparent 100%);
+      pointer-events: none;
+      opacity: 0.28;
+      z-index: 0;
+    }
+
+    ::selection {
+      background: rgba(216,196,255,0.28);
+      color: #fff;
+    }
+
     #particles-canvas {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.4;
+      opacity: 0.55;
     }
 
-    /* ─── ENVELOPE ─── */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 999px;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.28;
+      animation: drift 16s ease-in-out infinite;
+    }
+    .orb-a {
+      width: 320px;
+      height: 320px;
+      left: -90px;
+      top: 10vh;
+      background: rgba(171, 129, 255, 0.22);
+    }
+    .orb-b {
+      width: 260px;
+      height: 260px;
+      right: -60px;
+      top: 42vh;
+      background: rgba(255, 170, 207, 0.18);
+      animation-delay: -5s;
+    }
+    .orb-c {
+      width: 240px;
+      height: 240px;
+      left: 35%;
+      bottom: -40px;
+      background: rgba(111, 84, 196, 0.22);
+      animation-delay: -8s;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(0,-18px,0) scale(1.06); }
+    }
+
     #envelope-screen {
       position: fixed;
       inset: 0;
-      background: linear-gradient(145deg, #0b0b12 0%, #1a1625 40%, #0b0b12 100%);
+      background:
+        radial-gradient(circle at top, rgba(216,196,255,0.14), transparent 34%),
+        linear-gradient(145deg, rgba(8,9,16,0.98) 0%, rgba(21,17,32,0.95) 45%, rgba(8,9,16,0.98) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       cursor: pointer;
-      transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1), transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
     }
+    #envelope-screen::before,
+    #envelope-screen::after {
+      content: '';
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(216,196,255,0.10), transparent 70%);
+      filter: blur(8px);
+    }
+    #envelope-screen::before { top: -140px; left: -80px; }
+    #envelope-screen::after { bottom: -180px; right: -80px; }
     #envelope-screen.hidden {
       opacity: 0;
-      transform: scale(1.08);
+      transform: scale(1.05);
       pointer-events: none;
     }
 
     .env-orb {
-      width: 160px;
-      height: 160px;
+      width: 190px;
+      height: 190px;
       border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, rgba(180,160,220,0.15), transparent 70%);
+      background: radial-gradient(circle at 50% 42%, rgba(235,225,255,0.24), rgba(216,196,255,0.08) 45%, transparent 72%);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 28px;
-      animation: envFloat 3s ease-in-out infinite;
+      margin-bottom: 30px;
+      animation: envFloat 3.4s ease-in-out infinite;
       position: relative;
+      box-shadow: 0 0 0 1px rgba(216,196,255,0.08), 0 0 60px rgba(133, 101, 214, 0.18);
     }
-    .env-orb::before {
+    .env-orb::before,
+    .env-orb::after {
       content: '';
       position: absolute;
-      inset: -6px;
       border-radius: 50%;
-      border: 1px solid rgba(180,160,220,0.1);
-      animation: orbPulse 3s ease-in-out infinite;
+      inset: -10px;
+      border: 1px solid rgba(216,196,255,0.12);
+      animation: orbPulse 3.4s ease-in-out infinite;
+    }
+    .env-orb::after {
+      inset: -24px;
+      opacity: 0.45;
+      animation-delay: -1.2s;
     }
     .env-icon {
-      font-size: 56px;
-      filter: drop-shadow(0 0 30px rgba(180,160,220,0.3));
+      font-size: 68px;
+      filter: drop-shadow(0 0 30px rgba(216,196,255,0.28));
     }
+    .env-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 40px);
+      color: #f2eaff;
+      opacity: 0;
+      animation: fadeSlide 0.8s forwards 0.35s;
+      letter-spacing: 0.2px;
+      text-align: center;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .env-sub {
+      font-size: 13px;
+      color: rgba(223,209,245,0.56);
+      margin-top: 10px;
+      opacity: 0;
+      animation: fadeSlide 0.8s forwards 0.58s;
+      letter-spacing: 0.45px;
+      text-align: center;
+    }
+    .env-tap {
+      position: absolute;
+      bottom: 46px;
+      font-size: 12px;
+      color: rgba(223,209,245,0.3);
+      animation: envPulse 1.8s ease-in-out infinite;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+    }
+
     @keyframes envFloat {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-12px); }
     }
     @keyframes orbPulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.08); opacity: 0.2; }
-    }
-
-    .env-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 30px;
-      color: #d4c8ec;
-      opacity: 0;
-      animation: fadeSlide 0.8s forwards 0.4s;
-      letter-spacing: 0.5px;
-    }
-    .env-sub {
-      font-size: 13px;
-      color: rgba(180,160,220,0.35);
-      margin-top: 8px;
-      opacity: 0;
-      animation: fadeSlide 0.8s forwards 0.7s;
-      letter-spacing: 0.3px;
-    }
-    .env-tap {
-      position: absolute;
-      bottom: 50px;
-      font-size: 12px;
-      color: rgba(180,160,220,0.2);
-      animation: envPulse 1.8s ease-in-out infinite;
-      letter-spacing: 1px;
+      0%, 100% { transform: scale(1); opacity: 0.55; }
+      50% { transform: scale(1.06); opacity: 0.15; }
     }
     @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     @keyframes envPulse {
-      0%, 100% { opacity: 0.2; }
-      50% { opacity: 0.6; }
+      0%, 100% { opacity: 0.22; }
+      50% { opacity: 0.68; }
     }
 
-    /* ─── CONTENT ─── */
     #main-content {
       position: relative;
       z-index: 1;
@@ -131,143 +232,228 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 80px 24px;
+      justify-content: center;
+      padding: 92px 24px;
       position: relative;
     }
 
     .section-inner {
-      max-width: 680px;
+      max-width: var(--max);
       width: 100%;
+      position: relative;
+      z-index: 2;
     }
 
-    /* ─── HERO ─── */
+    .section-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-xl);
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+    .section-shell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(216,196,255,0.06), transparent 38%, transparent 62%, rgba(255,199,223,0.04));
+      pointer-events: none;
+    }
+
     #hero {
-      background: linear-gradient(165deg, #0b0b12 0%, #1a1625 50%, #0b0b12 100%);
-      justify-content: center;
       text-align: center;
       min-height: 100vh;
     }
+    #hero .section-shell {
+      padding: 56px 40px;
+      background:
+        radial-gradient(circle at top, rgba(216,196,255,0.10), transparent 42%),
+        linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(216,196,255,0.18);
+      background: rgba(255,255,255,0.04);
+      color: rgba(233,225,245,0.76);
+      font-size: 12px;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
     .hero-icon {
-      font-size: 48px;
-      margin-bottom: 24px;
+      font-size: 58px;
+      margin-bottom: 22px;
+      filter: drop-shadow(0 0 22px rgba(216,196,255,0.22));
     }
     .hero-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(26px, 5vw, 38px);
-      line-height: 1.4;
-      color: #d4c8ec;
-      font-weight: 400;
-      margin-bottom: 18px;
-      letter-spacing: -0.3px;
+      font-size: clamp(32px, 5vw, 48px);
+      line-height: 1.18;
+      color: #f4ebff;
+      font-weight: 600;
+      margin-bottom: 16px;
+      letter-spacing: -0.6px;
+      text-shadow: 0 10px 28px rgba(0,0,0,0.24);
     }
     .hero-divider {
-      width: 40px;
+      width: 78px;
       height: 1px;
-      background: rgba(180,160,220,0.2);
-      margin: 12px auto 18px;
+      background: linear-gradient(90deg, transparent, rgba(216,196,255,0.75), transparent);
+      margin: 0 auto 20px;
+      position: relative;
+    }
+    .hero-divider::after {
+      content: '✦';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 0 10px;
+      background: transparent;
+      color: rgba(216,196,255,0.82);
+      font-size: 10px;
     }
     .hero-sub {
-      font-size: clamp(14px, 2.5vw, 16px);
-      color: rgba(180,160,220,0.5);
+      font-size: clamp(15px, 2.5vw, 17px);
+      color: rgba(233,225,245,0.72);
       font-weight: 300;
-      max-width: 480px;
-      line-height: 1.8;
+      max-width: 540px;
+      line-height: 1.9;
       margin: 0 auto;
     }
     .hero-scroll {
       position: absolute;
       bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(216,196,255,0.14);
+      background: rgba(255,255,255,0.03);
+      display: grid;
+      place-items: center;
       font-size: 18px;
-      color: rgba(180,160,220,0.15);
+      color: rgba(216,196,255,0.45);
       animation: scrollBounce 2.2s ease-in-out infinite;
+      backdrop-filter: blur(12px);
     }
     @keyframes scrollBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(6px); }
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(7px); }
     }
 
-    /* ─── LETTER ─── */
-    #letter {
-      background: linear-gradient(165deg, #0b0b12, #151120, #0b0b12);
+    #letter,
+    #memories,
+    #reasons,
+    #closing {
+      min-height: auto;
     }
+
+    #letter .section-shell,
+    #memories .section-shell,
+    #reasons .section-shell,
+    #closing .section-shell {
+      padding: 34px;
+    }
+
     .letter-card {
-      background: linear-gradient(
-        160deg,
-        rgba(255,255,255,0.03) 0%,
-        rgba(180,160,220,0.04) 100%
-      );
-      border: 1px solid rgba(180,160,220,0.08);
-      border-radius: 20px;
-      padding: 52px 40px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.02));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 56px 44px;
       position: relative;
+      box-shadow: var(--glow);
+      overflow: hidden;
     }
     .letter-card::before {
       content: '';
       position: absolute;
-      top: -1px;
-      left: 40px;
-      right: 40px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(180,160,220,0.2), transparent);
+      top: 0;
+      left: 36px;
+      right: 36px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(216,196,255,0.6), transparent);
+    }
+    .letter-card::after {
+      content: '';
+      position: absolute;
+      inset: auto -50px -70px auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,199,223,0.10), transparent 72%);
+      pointer-events: none;
     }
     .letter-card .ornament {
       text-align: center;
       font-size: 28px;
       margin-bottom: 28px;
-      opacity: 0.5;
+      opacity: 0.68;
+      color: rgba(216,196,255,0.9);
     }
     .letter-body {
       font-size: 15px;
-      line-height: 2;
-      color: rgba(232,228,240,0.78);
+      line-height: 2.05;
+      color: rgba(244,239,251,0.80);
       font-weight: 300;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
     }
     .letter-body p {
       margin-bottom: 18px;
-      text-indent: 0;
+      position: relative;
     }
     .letter-body p:first-of-type {
-      text-indent: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      line-height: 1.3;
+      color: #f6ecff;
+      margin-bottom: 26px;
+      letter-spacing: -0.4px;
     }
     .letter-body strong {
-      color: rgba(212,200,236,0.9);
+      color: #f2e5ff;
       font-weight: 500;
     }
 
-    /* ─── TIMELINE ─── */
-    #memories {
-      background: #0b0b12;
-    }
     .section-label {
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 3px;
-      color: rgba(180,160,220,0.3);
+      color: rgba(216,196,255,0.48);
       margin-bottom: 12px;
     }
     .section-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(24px, 4vw, 32px);
-      color: #d4c8ec;
-      font-weight: 400;
-      margin-bottom: 8px;
+      font-size: clamp(28px, 4vw, 36px);
+      color: #f2e8ff;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.4px;
     }
     .section-desc {
       font-size: 14px;
-      color: rgba(180,160,220,0.4);
-      margin-bottom: 48px;
+      color: rgba(223,209,245,0.58);
+      margin-bottom: 42px;
+      line-height: 1.85;
+      max-width: 560px;
     }
 
     .timeline {
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 10px;
     }
     .tl-item {
       display: flex;
       gap: 20px;
-      padding-bottom: 36px;
+      padding: 0 0 18px;
       position: relative;
       opacity: 0;
       transform: translateY(20px);
@@ -283,152 +469,172 @@
       align-items: center;
       flex-shrink: 0;
       width: 32px;
+      margin-top: 2px;
     }
     .tl-dot {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      border: 2px solid rgba(180,160,220,0.2);
-      background: #0b0b12;
+      border: 2px solid rgba(216,196,255,0.34);
+      background: linear-gradient(180deg, rgba(24,20,38,1), rgba(12,11,20,1));
       flex-shrink: 0;
       transition: all 0.5s ease;
+      box-shadow: 0 0 0 8px rgba(216,196,255,0.03);
     }
     .tl-item.visible .tl-dot {
-      border-color: rgba(180,160,220,0.5);
-      box-shadow: 0 0 12px rgba(180,160,220,0.08);
+      border-color: rgba(216,196,255,0.82);
+      box-shadow: 0 0 18px rgba(216,196,255,0.16), 0 0 0 8px rgba(216,196,255,0.04);
     }
     .tl-line {
       width: 1px;
       flex: 1;
-      background: linear-gradient(180deg, rgba(180,160,220,0.12), transparent);
-      margin-top: 4px;
+      background: linear-gradient(180deg, rgba(216,196,255,0.24), transparent);
+      margin-top: 6px;
     }
     .tl-body {
       flex: 1;
-      padding-top: 2px;
+      padding: 18px 18px 18px 20px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(216,196,255,0.08);
+      backdrop-filter: blur(10px);
     }
     .tl-icon {
-      font-size: 22px;
-      margin-bottom: 6px;
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: rgba(216,196,255,0.9);
     }
     .tl-body h4 {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 500;
-      color: #d4c8ec;
-      margin-bottom: 4px;
+      color: #f0e5ff;
+      margin-bottom: 6px;
     }
     .tl-body p {
       font-size: 14px;
-      color: rgba(180,160,220,0.5);
+      color: rgba(223,209,245,0.66);
       font-weight: 300;
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
-    /* ─── REASONS ─── */
-    #reasons {
-      background: linear-gradient(165deg, #151120, #0b0b12);
-    }
     .reasons-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
       margin-top: 8px;
     }
     .rc {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(180,160,220,0.06);
-      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(216,196,255,0.10);
+      border-radius: 20px;
       padding: 28px 22px;
       text-align: center;
       transition: all 0.35s ease;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+    }
+    .rc::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(216,196,255,0.06), transparent 38%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
     }
     .rc:hover {
-      border-color: rgba(180,160,220,0.15);
-      background: rgba(255,255,255,0.03);
-      transform: translateY(-3px);
+      border-color: rgba(216,196,255,0.20);
+      background: rgba(255,255,255,0.045);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.24), 0 0 30px rgba(129, 98, 201, 0.10);
     }
+    .rc:hover::before { opacity: 1; }
     .rc-icon {
       font-size: 32px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 4px 14px rgba(216,196,255,0.18));
     }
     .rc h4 {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
-      color: #d4c8ec;
+      color: #f3e9ff;
       margin-bottom: 8px;
     }
     .rc p {
       font-size: 13px;
-      color: rgba(180,160,220,0.45);
+      color: rgba(223,209,245,0.62);
       font-weight: 300;
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
-    /* ─── CLOSING ─── */
     #closing {
-      background: linear-gradient(165deg, #0b0b12, #1a1625, #0b0b12);
       text-align: center;
-      justify-content: center;
       min-height: 100vh;
     }
+    #closing .section-shell {
+      padding: 52px 34px;
+      background:
+        radial-gradient(circle at top, rgba(216,196,255,0.08), transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.018));
+    }
     .closing-orb {
-      width: 72px;
-      height: 72px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, rgba(180,160,220,0.08), transparent 70%);
+      background: radial-gradient(circle at 45% 35%, rgba(216,196,255,0.18), transparent 70%);
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 24px;
-      font-size: 30px;
+      font-size: 34px;
       animation: envFloat 3s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(216,196,255,0.10), 0 0 40px rgba(133,101,214,0.12);
     }
     .closing-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(28px, 5vw, 40px);
-      color: #d4c8ec;
-      font-weight: 400;
+      font-size: clamp(32px, 5vw, 44px);
+      color: #f5edff;
+      font-weight: 600;
       margin-bottom: 16px;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.4px;
     }
     .closing-text {
       font-size: 14px;
-      color: rgba(180,160,220,0.5);
+      color: rgba(223,209,245,0.68);
       font-weight: 300;
-      max-width: 520px;
+      max-width: 560px;
       line-height: 2;
       margin: 0 auto;
     }
     .closing-divider {
-      width: 30px;
+      width: 54px;
       height: 1px;
-      background: rgba(180,160,220,0.15);
+      background: linear-gradient(90deg, transparent, rgba(216,196,255,0.7), transparent);
       margin: 20px auto;
     }
 
-    /* ─── FLOATING PARTICLES (click) ─── */
     .particle-burst {
       position: fixed;
       pointer-events: none;
       z-index: 3;
       font-size: 14px;
       animation: particleUp 2.8s ease-out forwards;
+      text-shadow: 0 0 16px rgba(216,196,255,0.26);
     }
     @keyframes particleUp {
       0% { transform: translateY(0) scale(1); opacity: 1; }
       100% { transform: translateY(-300px) scale(0.2); opacity: 0; }
     }
 
-    /* ─── MUSIC BTN ─── */
     .music-btn {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      width: 44px;
-      height: 44px;
-      background: rgba(180,160,220,0.06);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(180,160,220,0.1);
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(216,196,255,0.12);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -436,34 +642,59 @@
       font-size: 16px;
       cursor: pointer;
       z-index: 100;
-      color: rgba(180,160,220,0.35);
+      color: rgba(216,196,255,0.52);
       transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.24);
     }
     .music-btn:hover {
-      background: rgba(180,160,220,0.1);
-      border-color: rgba(180,160,220,0.2);
-      color: rgba(180,160,220,0.6);
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(216,196,255,0.22);
+      color: rgba(240,230,255,0.85);
+      transform: translateY(-2px);
     }
     .music-btn.playing {
-      color: #d4c8ec;
-      border-color: rgba(180,160,220,0.2);
+      color: #f6ecff;
+      border-color: rgba(216,196,255,0.26);
       animation: mPulse 2.5s ease-in-out infinite;
+      box-shadow: 0 0 22px rgba(133,101,214,0.18);
     }
     @keyframes mPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(180,160,220,0.06); }
-      50% { box-shadow: 0 0 16px 4px rgba(180,160,220,0.04); }
+      0%, 100% { box-shadow: 0 0 0 0 rgba(180,160,220,0.06), 0 0 22px rgba(133,101,214,0.18); }
+      50% { box-shadow: 0 0 0 8px rgba(180,160,220,0.02), 0 0 26px rgba(133,101,214,0.22); }
+    }
+
+    @media (max-width: 700px) {
+      section { padding: 72px 18px; }
+      .section-shell,
+      #hero .section-shell,
+      #closing .section-shell,
+      #letter .section-shell,
+      #memories .section-shell,
+      #reasons .section-shell { padding: 24px; }
+      .letter-card { padding: 36px 22px; }
+      .hero-title { line-height: 1.24; }
+      .letter-body p:first-of-type { font-size: 24px; }
+      .reasons-grid { grid-template-columns: 1fr; }
+      .tl-body { padding: 16px; }
     }
 
     @media (max-width: 520px) {
-      section { padding: 60px 18px; }
-      .letter-card { padding: 36px 22px; }
-      .reasons-grid { grid-template-columns: 1fr; }
+      .env-title { font-size: 28px; }
+      .env-orb { width: 168px; height: 168px; }
+      .hero-badge { font-size: 11px; }
+      .hero-icon { font-size: 48px; }
+      .hero-title { font-size: 31px; }
+      .section-title { font-size: 28px; }
+      .closing-title { font-size: 32px; }
     }
   </style>
 </head>
 <body>
 
   <canvas id="particles-canvas"></canvas>
+  <div class="ambient-orb orb-a"></div>
+  <div class="ambient-orb orb-b"></div>
+  <div class="ambient-orb orb-c"></div>
 
   <!-- ENVELOPE -->
   <div id="envelope-screen" onclick="openEnvelope()">
@@ -486,13 +717,16 @@
     <!-- HERO -->
     <section id="hero">
       <div class="section-inner">
-        <div class="hero-icon">🤍</div>
-        <h1 class="hero-title">For-you Dear</h1>
-        <div class="hero-divider"></div>
-        <p class="hero-sub">
-          Terima kasih sudah meluangkan waktu membuka halaman ini, ada sesuatu yang
-          ingin saya sampaikan dari hati.
-        </p>
+        <div class="section-shell">
+          <div class="hero-badge">✦ for you, dear</div>
+          <div class="hero-icon">🤍</div>
+          <h1 class="hero-title">For-you Dear</h1>
+          <div class="hero-divider"></div>
+          <p class="hero-sub">
+            Terima kasih sudah meluangkan waktu membuka halaman ini, ada sesuatu yang
+            ingin saya sampaikan dari hati.
+          </p>
+        </div>
         <div class="hero-scroll">⌄</div>
       </div>
     </section>
@@ -500,51 +734,53 @@
     <!-- LETTER -->
     <section id="letter">
       <div class="section-inner">
-        <div class="letter-card">
-          <div class="ornament">— 🤍 —</div>
-          <div class="letter-body">
-            <p>Hai...</p>
-            <p>
-              Beberapa hari ini saya memilih diam. Bukan karena marah, bukan karena
-              rasa sayang saya berkurang, apalagi karena ada orang lain. saya cuma
-              sedang kelelahan.
-            </p>
-            <p>
-              Setelah semuanya mulai tenang, saya sadar kalau selama kita berdebat,
-              kita sama-sama sibuk menyampaikan apa yang kita rasakan, sampai lupa
-              mendengar apa yang sebenarnya sedang dirasakan satu sama lain.
-            </p>
-            <p>
-              saya minta maaf kalau cara saya menyampaikan sesuatu sering terdengar
-              seperti melawan. Padahal yang selama ini saya lakukan cuma berusaha
-              menjelaskan isi kepala saya, bukan mencari siapa yang benar atau siapa
-              yang salah.
-            </p>
-            <p>
-              Di balik semua itu, ada banyak hal yang selama ini saya pendam sendiri.
-              Soal pekerjaan, keuangan, keluarga, masa depan, dan keinginan saya
-              untuk bisa menjadi laki-laki yang benar-benar pantas buat kamu.
-              Semua itu terus berputar di kepala saya setiap hari sampai saya sendiri
-              lupa caranya istirahat.
-            </p>
-            <p>
-              Maaf kalau selama ini saya terlalu sibuk memendam semuanya sendirian.
-              Maaf kalau saya belum bisa menjadi pasangan yang sempurna. Tapi ada
-              satu hal yang ingin saya pastikan,
-              <strong>rasa sayang saya ke kamu tidak pernah berubah.</strong>
-            </p>
-            <p>
-              Terima kasih karena masih bertahan sampai hari ini. Semoga setelah
-              kamu selesai membaca halaman ini, kita bisa mulai lagi dengan hati
-              yang lebih tenang, bukan dengan ego yang lebih besar.
-            </p>
-            <p>
-              <strong>
-                saya masih memilih kamu. Dan sampai hari ini, saya masih punya tujuan
-                yang sama seperti dulu, yaitu berjuang supaya suatu hari nanti bisa
-                menghalalkan kamu.
-              </strong>
-            </p>
+        <div class="section-shell">
+          <div class="letter-card">
+            <div class="ornament">— 🤍 —</div>
+            <div class="letter-body">
+              <p>Hai...</p>
+              <p>
+                Beberapa hari ini saya memilih diam. Bukan karena marah, bukan karena
+                rasa sayang saya berkurang, apalagi karena ada orang lain. saya cuma
+                sedang kelelahan.
+              </p>
+              <p>
+                Setelah semuanya mulai tenang, saya sadar kalau selama kita berdebat,
+                kita sama-sama sibuk menyampaikan apa yang kita rasakan, sampai lupa
+                mendengar apa yang sebenarnya sedang dirasakan satu sama lain.
+              </p>
+              <p>
+                saya minta maaf kalau cara saya menyampaikan sesuatu sering terdengar
+                seperti melawan. Padahal yang selama ini saya lakukan cuma berusaha
+                menjelaskan isi kepala saya, bukan mencari siapa yang benar atau siapa
+                yang salah.
+              </p>
+              <p>
+                Di balik semua itu, ada banyak hal yang selama ini saya pendam sendiri.
+                Soal pekerjaan, keuangan, keluarga, masa depan, dan keinginan saya
+                untuk bisa menjadi laki-laki yang benar-benar pantas buat kamu.
+                Semua itu terus berputar di kepala saya setiap hari sampai saya sendiri
+                lupa caranya istirahat.
+              </p>
+              <p>
+                Maaf kalau selama ini saya terlalu sibuk memendam semuanya sendirian.
+                Maaf kalau saya belum bisa menjadi pasangan yang sempurna. Tapi ada
+                satu hal yang ingin saya pastikan,
+                <strong>rasa sayang saya ke kamu tidak pernah berubah.</strong>
+              </p>
+              <p>
+                Terima kasih karena masih bertahan sampai hari ini. Semoga setelah
+                kamu selesai membaca halaman ini, kita bisa mulai lagi dengan hati
+                yang lebih tenang, bukan dengan ego yang lebih besar.
+              </p>
+              <p>
+                <strong>
+                  saya masih memilih kamu. Dan sampai hari ini, saya masih punya tujuan
+                  yang sama seperti dulu, yaitu berjuang supaya suatu hari nanti bisa
+                  menghalalkan kamu.
+                </strong>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -553,56 +789,58 @@
     <!-- MEMORIES -->
     <section id="memories">
       <div class="section-inner">
-        <div class="section-label">Kenangan</div>
-        <h2 class="section-title">Perjalanan Kita</h2>
-        <p class="section-desc">Hal-hal yang mengingatkan kenapa saya masih bertahan</p>
+        <div class="section-shell">
+          <div class="section-label">Kenangan</div>
+          <h2 class="section-title">Perjalanan Kita</h2>
+          <p class="section-desc">Hal-hal yang mengingatkan kenapa saya masih bertahan</p>
 
-        <div class="timeline">
-          <div class="tl-item" data-delay="0">
-            <div class="tl-marker">
-              <div class="tl-dot"></div>
-              <div class="tl-line"></div>
+          <div class="timeline">
+            <div class="tl-item" data-delay="0">
+              <div class="tl-marker">
+                <div class="tl-dot"></div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-icon">༄</div>
+                <h4>Semuanya Dimulai</h4>
+                <p>Dari awal kita kenal sampai hari ini, saya masih memilih orang yang sama. Kamu.</p>
+              </div>
             </div>
-            <div class="tl-body">
-              <div class="tl-icon">༄</div>
-              <h4>Semuanya Dimulai</h4>
-              <p>Dari awal kita kenal sampai hari ini, saya masih memilih orang yang sama. Kamu.</p>
-            </div>
-          </div>
 
-          <div class="tl-item" data-delay="150">
-            <div class="tl-marker">
-              <div class="tl-dot"></div>
-              <div class="tl-line"></div>
+            <div class="tl-item" data-delay="150">
+              <div class="tl-marker">
+                <div class="tl-dot"></div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-icon">༄</div>
+                <h4>Setiap Pertengkaran</h4>
+                <p>Kita pernah saling kecewa, pernah saling menyakiti, tapi saya percaya hubungan ini selalu lebih berharga daripada ego kita.</p>
+              </div>
             </div>
-            <div class="tl-body">
-              <div class="tl-icon">༄</div>
-              <h4>Setiap Pertengkaran</h4>
-              <p>Kita pernah saling kecewa, pernah saling menyakiti, tapi saya percaya hubungan ini selalu lebih berharga daripada ego kita.</p>
-            </div>
-          </div>
 
-          <div class="tl-item" data-delay="300">
-            <div class="tl-marker">
-              <div class="tl-dot"></div>
-              <div class="tl-line"></div>
+            <div class="tl-item" data-delay="300">
+              <div class="tl-marker">
+                <div class="tl-dot"></div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-icon">༄</div>
+                <h4>Fase Dewasa</h4>
+                <p>Sekarang hidup bukan cuma soal cinta. Ada pekerjaan, keluarga, tanggung jawab, dan masa depan yang sedang saya perjuangkan sedikit demi sedikit.</p>
+              </div>
             </div>
-            <div class="tl-body">
-              <div class="tl-icon">༄</div>
-              <h4>Fase Dewasa</h4>
-              <p>Sekarang hidup bukan cuma soal cinta. Ada pekerjaan, keluarga, tanggung jawab, dan masa depan yang sedang saya perjuangkan sedikit demi sedikit.</p>
-            </div>
-          </div>
 
-          <div class="tl-item" data-delay="450">
-            <div class="tl-marker">
-              <div class="tl-dot"></div>
-              <div class="tl-line"></div>
-            </div>
-            <div class="tl-body">
-              <div class="tl-icon">༄</div>
-              <h4>Harapan saya</h4>
-              <p>Saya belum bisa memberi semua yang kamu inginkan hari ini. Tapi saya masih ingin terus berjuang sampai nanti kita bisa menikmati semuanya bersama</p>
+            <div class="tl-item" data-delay="450">
+              <div class="tl-marker">
+                <div class="tl-dot"></div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-icon">༄</div>
+                <h4>Harapan saya</h4>
+                <p>Saya belum bisa memberi semua yang kamu inginkan hari ini. Tapi saya masih ingin terus berjuang sampai nanti kita bisa menikmati semuanya bersama</p>
+              </div>
             </div>
           </div>
         </div>
@@ -612,30 +850,32 @@
     <!-- REASONS -->
     <section id="reasons">
       <div class="section-inner">
-        <div class="section-label">Alasan</div>
-        <h2 class="section-title">Kenapa saya Masih Bertahan</h2>
-        <p class="section-desc">Bukan karena alasan besar. Hanya hal kecil yang membuat saya yakin.</p>
+        <div class="section-shell">
+          <div class="section-label">Alasan</div>
+          <h2 class="section-title">Kenapa saya Masih Bertahan</h2>
+          <p class="section-desc">Bukan karena alasan besar. Hanya hal kecil yang membuat saya yakin.</p>
 
-        <div class="reasons-grid">
-          <div class="rc">
-            <div class="rc-icon">❤️</div>
-            <h4>Karena Kamu Adalah Rumah</h4>
-            <p>Di tengah semua masalah yang datang, tetap kamu yang selalu ingin saya pulangi.</p>
-          </div>
-          <div class="rc">
-            <div class="rc-icon">🌸</div>
-            <h4>Karena saya Masih Sangat Sayang</h4>
-            <p>Seberat apa pun hari yang saya jalani, rasa sayang itu tidak pernah berubah.</p>
-          </div>
-          <div class="rc">
-            <div class="rc-icon">🤍</div>
-            <h4>Karena Hubungan Ini Layak Diperjuangkan</h4>
-            <p>saya tidak ingin menyerah hanya karena kita sedang berada di fase yang sulit.</p>
-          </div>
-          <div class="rc">
-            <div class="rc-icon">💍</div>
-            <h4>Karena Tujuan saya Masih Sama</h4>
-            <p>Dari dulu sampai sekarang, saya masih ingin berjuang supaya suatu hari nanti bisa menghalalkan kamu.</p>
+          <div class="reasons-grid">
+            <div class="rc">
+              <div class="rc-icon">❤️</div>
+              <h4>Karena Kamu Adalah Rumah</h4>
+              <p>Di tengah semua masalah yang datang, tetap kamu yang selalu ingin saya pulangi.</p>
+            </div>
+            <div class="rc">
+              <div class="rc-icon">🌸</div>
+              <h4>Karena saya Masih Sangat Sayang</h4>
+              <p>Seberat apa pun hari yang saya jalani, rasa sayang itu tidak pernah berubah.</p>
+            </div>
+            <div class="rc">
+              <div class="rc-icon">🤍</div>
+              <h4>Karena Hubungan Ini Layak Diperjuangkan</h4>
+              <p>saya tidak ingin menyerah hanya karena kita sedang berada di fase yang sulit.</p>
+            </div>
+            <div class="rc">
+              <div class="rc-icon">💍</div>
+              <h4>Karena Tujuan saya Masih Sama</h4>
+              <p>Dari dulu sampai sekarang, saya masih ingin berjuang supaya suatu hari nanti bisa menghalalkan kamu.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -644,19 +884,21 @@
     <!-- CLOSING -->
     <section id="closing">
       <div class="section-inner">
-        <div class="closing-orb">🤍</div>
-        <h2 class="closing-title">Love you, always</h2>
-        <div class="closing-divider"></div>
-        <p class="closing-text">
-          Terima kasih sudah membaca semuanya sampai akhir. Kalau hari ini kamu
-          masih kecewa atau masih marah, saya mengerti. saya cuma berharap kamu bisa
-          mengerti satu hal: diamnya saya beberapa hari ini bukan karena berhenti
-          mencintaimu. saya hanya sedang berusaha berdamai dengan banyak hal yang
-          sedang saya hadapi. Semoga setelah ini kita bisa belajar saling mendengar,
-          saling mengerti, dan terus berjalan bersama.
-        </p>
-        <div style="margin-top:32px; font-size:12px; color:rgba(180,160,220,0.2);">
-          — ketuk di mana saja —
+        <div class="section-shell">
+          <div class="closing-orb">🤍</div>
+          <h2 class="closing-title">Love you, always</h2>
+          <div class="closing-divider"></div>
+          <p class="closing-text">
+            Terima kasih sudah membaca semuanya sampai akhir. Kalau hari ini kamu
+            masih kecewa atau masih marah, saya mengerti. saya cuma berharap kamu bisa
+            mengerti satu hal: diamnya saya beberapa hari ini bukan karena berhenti
+            mencintaimu. saya hanya sedang berusaha berdamai dengan banyak hal yang
+            sedang saya hadapi. Semoga setelah ini kita bisa belajar saling mendengar,
+            saling mengerti, dan terus berjalan bersama.
+          </p>
+          <div style="margin-top:32px; font-size:12px; color:rgba(223,209,245,0.24); letter-spacing:1px; text-transform:uppercase;">
+            — ketuk di mana saja —
+          </div>
         </div>
       </div>
     </section>
@@ -664,9 +906,6 @@
   </div>
 
   <script>
-    /* ════════════════════════════════════════
-       PARTICLES
-    ════════════════════════════════════════ */
     const cv = document.getElementById('particles-canvas');
     const cx = cv.getContext('2d');
     let pts = [];
@@ -680,12 +919,12 @@
 
     function initPts() {
       pts = [];
-      const n = Math.floor((cv.width * cv.height) / 4000);
+      const n = Math.floor((cv.width * cv.height) / 5200);
       for (let i = 0; i < n; i++) {
         pts.push({
           x: Math.random() * cv.width,
           y: Math.random() * cv.height,
-          r: Math.random() * 1.6 + 0.4,
+          r: Math.random() * 1.8 + 0.3,
           a: Math.random(),
           s: 0.001 + Math.random() * 0.004
         });
@@ -695,10 +934,10 @@
     function drawPts(t) {
       cx.clearRect(0, 0, cv.width, cv.height);
       pts.forEach(p => {
-        p.a = 0.15 + Math.sin(t * p.s) * 0.25;
+        p.a = 0.1 + Math.sin(t * p.s) * 0.28;
         cx.beginPath();
         cx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        cx.fillStyle = `rgba(180, 160, 220, ${Math.max(0, p.a)})`;
+        cx.fillStyle = `rgba(216, 196, 255, ${Math.max(0, p.a)})`;
         cx.fill();
       });
       requestAnimationFrame(drawPts);
@@ -707,21 +946,15 @@
     drawPts(0);
     window.addEventListener('resize', () => { resize(); initPts(); });
 
-    /* ════════════════════════════════════════
-       ENVELOPE
-    ════════════════════════════════════════ */
     function openEnvelope() {
       const env = document.getElementById('envelope-screen');
       env.classList.add('hidden');
       document.getElementById('main-content').classList.add('visible');
       startMusicAfterFirstTap();
       setTimeout(spawnParticle, 600);
-      window._burstInterval = setInterval(spawnParticle, 500);
+      window._burstInterval = setInterval(spawnParticle, 620);
     }
 
-    /* ════════════════════════════════════════
-       TIMELINE INTERSECTION
-    ════════════════════════════════════════ */
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -733,10 +966,7 @@
 
     document.querySelectorAll('.tl-item').forEach(el => obs.observe(el));
 
-    /* ════════════════════════════════════════
-       PARTICLE BURST ON CLICK
-    ════════════════════════════════════════ */
-    const particleChars = ['🤍', '✦', '·', '🤍', '·', '✦', '🤍'];
+    const particleChars = ['🤍', '✦', '·', '⋆', '♡', '✧'];
 
     function spawnParticle() {
       const el = document.createElement('div');
@@ -757,9 +987,6 @@
       }
     });
 
-    /* ════════════════════════════════════════
-       MUSIC
-    ════════════════════════════════════════ */
     let playing = false;
     let hasUnlockedAutoplay = false;
     const mBtn = document.getElementById('musicBtn');

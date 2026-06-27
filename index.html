@@ -645,7 +645,7 @@
     <section id="closing">
       <div class="section-inner">
         <div class="closing-orb">🤍</div>
-        <h2 class="closing-title">Aku Sayang Kamu, Selalu</h2>
+        <h2 class="closing-title">Love you, always</h2>
         <div class="closing-divider"></div>
         <p class="closing-text">
           Terima kasih sudah membaca semuanya sampai akhir. Kalau hari ini kamu
@@ -714,6 +714,7 @@
       const env = document.getElementById('envelope-screen');
       env.classList.add('hidden');
       document.getElementById('main-content').classList.add('visible');
+      startMusicAfterFirstTap();
       setTimeout(spawnParticle, 600);
       window._burstInterval = setInterval(spawnParticle, 500);
     }
@@ -760,9 +761,24 @@
        MUSIC
     ════════════════════════════════════════ */
     let playing = false;
+    let hasUnlockedAutoplay = false;
     const mBtn = document.getElementById('musicBtn');
     const bgMusic = document.getElementById('bgMusic');
     bgMusic.volume = 0.45;
+
+    async function startMusicAfterFirstTap() {
+      if (playing || hasUnlockedAutoplay) return;
+
+      try {
+        await bgMusic.play();
+        playing = true;
+        hasUnlockedAutoplay = true;
+        mBtn.classList.add('playing');
+        mBtn.textContent = '♩';
+      } catch (err) {
+        console.error('Music autoplay after first tap failed:', err);
+      }
+    }
 
     async function toggleMusic() {
       if (playing) {
@@ -777,6 +793,7 @@
       try {
         await bgMusic.play();
         playing = true;
+        hasUnlockedAutoplay = true;
         mBtn.classList.add('playing');
         mBtn.textContent = '♩';
       } catch (err) {

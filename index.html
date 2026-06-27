@@ -619,11 +619,13 @@
       z-index: 3;
       font-size: 14px;
       animation: particleUp 2.8s ease-out forwards;
-      text-shadow: 0 0 16px rgba(216,196,255,0.26);
+      text-shadow: 0 0 18px rgba(255, 214, 234, 0.42);
+      filter: drop-shadow(0 0 10px rgba(255, 209, 232, 0.24));
     }
     @keyframes particleUp {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-300px) scale(0.2); opacity: 0; }
+      0% { transform: translate3d(0, 0, 0) scale(0.95); opacity: 0; }
+      10% { opacity: 0.95; }
+      100% { transform: translate3d(var(--driftX, 0px), -115vh, 0) scale(0.72); opacity: 0; }
     }
 
     .music-btn {
@@ -951,8 +953,8 @@
       env.classList.add('hidden');
       document.getElementById('main-content').classList.add('visible');
       startMusicAfterFirstTap();
-      setTimeout(spawnParticle, 600);
-      window._burstInterval = setInterval(spawnParticle, 620);
+      setTimeout(() => spawnParticle(), 220);
+      window._burstInterval = setInterval(() => spawnParticle(false), 180);
     }
 
     const obs = new IntersectionObserver((entries) => {
@@ -966,24 +968,29 @@
 
     document.querySelectorAll('.tl-item').forEach(el => obs.observe(el));
 
-    const particleChars = ['🤍', '✦', '·', '⋆', '♡', '✧'];
+    const particleChars = ['🤍', '♡'];
+    const particlePalette = ['#ffffff', '#ffe7f2', '#ffd2e8', '#f7ddff'];
 
-    function spawnParticle() {
+    function spawnParticle(fromClick = false) {
       const el = document.createElement('div');
       el.className = 'particle-burst';
       el.textContent = particleChars[Math.floor(Math.random() * particleChars.length)];
-      el.style.left = Math.random() * 100 + 'vw';
-      el.style.bottom = '-10px';
-      el.style.fontSize = (12 + Math.random() * 14) + 'px';
-      el.style.animationDuration = (2 + Math.random() * 2.5) + 's';
+      const baseLeft = fromClick ? Math.max(4, Math.min(96, (window._lastClickX / window.innerWidth) * 100)) : Math.random() * 100;
+      el.style.left = `calc(${baseLeft}vw + ${(Math.random() * 24 - 12).toFixed(1)}px)`;
+      el.style.bottom = (fromClick ? (6 + Math.random() * 16) : (-12 + Math.random() * 18)) + 'px';
+      el.style.fontSize = (fromClick ? (15 + Math.random() * 10) : (13 + Math.random() * 8)) + 'px';
+      el.style.animationDuration = (fromClick ? (3.2 + Math.random() * 1.6) : (4.4 + Math.random() * 2.3)) + 's';
+      el.style.setProperty('--driftX', `${(Math.random() * 120 - 60).toFixed(1)}px`);
+      el.style.color = particlePalette[Math.floor(Math.random() * particlePalette.length)];
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 5000);
+      setTimeout(() => el.remove(), 7600);
     }
 
     document.addEventListener('click', (e) => {
       if (e.target.closest('#envelope-screen') || e.target.closest('.music-btn')) return;
-      for (let i = 0; i < 6; i++) {
-        setTimeout(spawnParticle, i * 60);
+      window._lastClickX = e.clientX || (window.innerWidth / 2);
+      for (let i = 0; i < 12; i++) {
+        setTimeout(() => spawnParticle(true), i * 45);
       }
     });
 

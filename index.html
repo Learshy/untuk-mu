@@ -26,6 +26,7 @@
       --radius-md: 18px;
       --shadow-card: 0 18px 60px rgba(0,0,0,0.34);
       --max: 760px;
+      --photo-height: clamp(320px, 58vw, 520px);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -326,6 +327,66 @@
       max-width: 540px;
       line-height: 1.9;
       margin: 0 auto;
+    }
+    .hero-photo-wrap {
+      margin: 30px auto 0;
+      max-width: 560px;
+      position: relative;
+    }
+    .hero-photo-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -18px;
+      background: radial-gradient(circle, rgba(255, 214, 234, 0.14), transparent 65%);
+      filter: blur(12px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-photo-card {
+      position: relative;
+      z-index: 1;
+      padding: 10px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255, 223, 239, 0.22);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.28), 0 0 36px rgba(255, 199, 223, 0.08);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+    }
+    .hero-photo-card::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0;
+      height: 44%;
+      background: linear-gradient(180deg, transparent, rgba(8,9,16,0.30) 45%, rgba(8,9,16,0.68));
+      pointer-events: none;
+    }
+    .hero-photo-card img {
+      width: 100%;
+      height: var(--photo-height);
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 20px;
+      filter: saturate(1.02) contrast(1.02) brightness(0.96);
+    }
+    .hero-photo-badge {
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      z-index: 2;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255, 227, 240, 0.22);
+      backdrop-filter: blur(10px);
+      color: rgba(255,245,250,0.88);
+      font-size: 12px;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.20);
     }
     .hero-scroll {
       position: absolute;
@@ -728,6 +789,13 @@
             Terima kasih sudah meluangkan waktu membuka halaman ini, ada sesuatu yang
             ingin saya sampaikan dari hati.
           </p>
+
+          <div class="hero-photo-wrap">
+            <div class="hero-photo-card">
+              <img src="assets/couple.jpg" alt="Foto bersama">
+              <div class="hero-photo-badge">♡ our little moment ♡</div>
+            </div>
+          </div>
         </div>
         <div class="hero-scroll">⌄</div>
       </div>
